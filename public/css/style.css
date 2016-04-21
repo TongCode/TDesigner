@@ -30,3 +30,11 @@ p{line-height:20px}
 .clearfix:after{clear:both}
 /** Fix clearfix:blueprintcss.lighthouseapp.com/projects/15318/tickets/5-extra-margin-padding-bottom-of-page **/
 .clearfix{zoom:1}
+
+
+.MainPanel{
+    width: 961px;
+    height: 641px;
+    /*background-color: #cccccc;*/
+    /*background-image: url("../images/bg.png");*/
+}

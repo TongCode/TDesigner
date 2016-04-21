@@ -1,0 +1,91 @@
+//
+   Created by Daniel on 16-4-6.
+
+extends layout
+
+block javascript
+    script(src="lib/jquery/jquery.js")
+    script(src="lib/jTongDesigner/jTongDesigner.js")
+    script(src="lib/jTongDesigner/Canvas.js")
+    script(src="lib/jTongDesigner/Graphics.js")
+    script(src="lib/jTongDesigner/Handler.js")
+    script(src="lib/jTongDesigner/CommonTable.js")
+
+    script(src="lib/jTongDesigner/form/IControl.js")
+    script(src="lib/jTongDesigner/form/TongApp.js")
+    script(src="lib/jTongDesigner/form/TongBaseComponent.js")
+    script(src="lib/jTongDesigner/form/TongComponentDGF.js")
+    script(src="lib/jTongDesigner/form/TongComponentSink.js")
+    script(src="lib/jTongDesigner/form/TongComponentSource.js")
+
+    script(type='text/javascript').
+        var ele = document.getElementById("Main");
+        var jtd = jTongDesigner.init(ele);
+
+        //创建APP
+        var appCanvas = jtd.createCanvas("testApp");
+
+        //创建显示元素
+        var app = new TongApp();
+        app.name = "a1";
+        app.text = "我的名字叫APP";
+        app.x = app.y =20;
+        app.width = 250;
+        app.height = 160;
+        //app.onmouseover = function(e){
+        //    console.log("我的名字叫APP，祢别碰我~");
+        //}
+        appCanvas.addControl(app);
+
+        var app1 = new TongApp();
+        app1.name = "a2";
+        app1.text = "woshi屎啊";
+        app1.x = 200;
+        app1.y = 50;
+        app1.width = 250;
+        app1.height = 160;
+        appCanvas.addControl(app1);
+
+        var tbc_DGF1 = new TongComponentDGF();
+        tbc_DGF1.name = "tbc_DGF1";
+        tbc_DGF1.width = tbc_DGF1.height = 50;
+        app1.addDGF(tbc_DGF1);
+
+        var tbc_CDC1 = new TongComponentSource();
+        tbc_CDC1.name = "tbc_CDC1";
+        tbc_CDC1.width = tbc_CDC1.height = 50;
+        app1.addSource(tbc_CDC1);
+
+        var tbc_TLQ1 = new TongComponentSink();
+        tbc_TLQ1.name = "tbc_TLQ1";
+        tbc_TLQ1.width = tbc_TLQ1.height = 50;
+        app1.addSink(tbc_TLQ1);
+
+        var tbc_DGF2 = new TongComponentDGF();
+        tbc_DGF2.name = "tbc_DGF2";
+        tbc_DGF2.width = tbc_DGF2.height = 50;
+        app.addDGF(tbc_DGF2);
+
+        var tbc_CDC2 = new TongComponentSource();
+        tbc_CDC2.name = "tbc_CDC2";
+        tbc_CDC2.width = tbc_CDC2.height = 50;
+        app.addSource(tbc_CDC2);
+
+        var tbc_TLQ2 = new TongComponentSink();
+        tbc_TLQ2.name = "tbc_TLQ2";
+        tbc_TLQ2.width = tbc_TLQ2.height = 50;
+        app.addSink(tbc_TLQ2);
+
+        //appCanvas.paint();
+        document.onclick = function(e){
+            console.log("body click");
+        }
+
+        function testClick(){
+            app.focus = !app.focus;
+            appCanvas.paint();
+        }
+
+block content
+    #Main.MainPanel
+    a(onclick="testClick()") 点击
