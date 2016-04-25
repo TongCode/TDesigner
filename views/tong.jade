@@ -10,10 +10,12 @@ block javascript
     script(src="lib/jTongDesigner/Graphics.js")
     script(src="lib/jTongDesigner/Handler.js")
     script(src="lib/jTongDesigner/CommonTable.js")
+    script(src="lib/jTongDesigner/ImageLoader.js")
 
     script(src="lib/jTongDesigner/form/IControl.js")
     script(src="lib/jTongDesigner/form/TongApp.js")
     script(src="lib/jTongDesigner/form/TongBaseComponent.js")
+    script(src="lib/jTongDesigner/form/TongArrow.js")
     script(src="lib/jTongDesigner/form/TongComponentDGF.js")
     script(src="lib/jTongDesigner/form/TongComponentSink.js")
     script(src="lib/jTongDesigner/form/TongComponentSource.js")
@@ -36,6 +38,36 @@ block javascript
         //    console.log("我的名字叫APP，祢别碰我~");
         //}
         appCanvas.addControl(app);
+
+        var tbc_DGF2 = new TongComponentDGF();
+        tbc_DGF2.name = "tbc_DGF2";
+        tbc_DGF2.width = tbc_DGF2.height = 50;
+        app.addDGF(tbc_DGF2);
+
+        var tbc_CDC2 = new TongComponentSource();
+        tbc_CDC2.name = "tbc_CDC2";
+        tbc_CDC2.width = tbc_CDC2.height = 50;
+        app.addSource(tbc_CDC2);
+
+        var tbc_TLQ2 = new TongComponentSink();
+        tbc_TLQ2.name = "tbc_TLQ2";
+        tbc_TLQ2.width = tbc_TLQ2.height = 50;
+        app.addSink(tbc_TLQ2);
+
+
+        //连接线
+        var arrow_app02_01 = new TongArrow();
+        arrow_app02_01.name = "arrow_app02_01";
+        arrow_app02_01.bindBegin(tbc_CDC2,tbc_CDC2.handleEnum.W);
+        arrow_app02_01.bindEnd(tbc_DGF2,tbc_DGF2.handleEnum.E);
+        app.addControl(arrow_app02_01);
+        //
+        var arrow_app02_02 = new TongArrow();
+        arrow_app02_02.name = "arrow_app02_02";
+        arrow_app02_02.bindBegin(tbc_DGF2,tbc_DGF2.handleEnum.W);
+        arrow_app02_02.bindEnd(tbc_TLQ2,tbc_TLQ2.handleEnum.E);
+        app.addControl(arrow_app02_02);
+
 
         var app1 = new TongApp();
         app1.name = "a2";
@@ -61,20 +93,31 @@ block javascript
         tbc_TLQ1.width = tbc_TLQ1.height = 50;
         app1.addSink(tbc_TLQ1);
 
-        var tbc_DGF2 = new TongComponentDGF();
-        tbc_DGF2.name = "tbc_DGF2";
-        tbc_DGF2.width = tbc_DGF2.height = 50;
-        app.addDGF(tbc_DGF2);
 
-        var tbc_CDC2 = new TongComponentSource();
-        tbc_CDC2.name = "tbc_CDC2";
-        tbc_CDC2.width = tbc_CDC2.height = 50;
-        app.addSource(tbc_CDC2);
 
-        var tbc_TLQ2 = new TongComponentSink();
-        tbc_TLQ2.name = "tbc_TLQ2";
-        tbc_TLQ2.width = tbc_TLQ2.height = 50;
-        app.addSink(tbc_TLQ2);
+        //连接线
+        var arrow_app01_01 = new TongArrow();
+        arrow_app01_01.name = "arrow_app01_01";
+        arrow_app01_01.bindBegin(tbc_CDC1,tbc_CDC1.handleEnum.W);
+        arrow_app01_01.bindEnd(tbc_DGF1,tbc_DGF1.handleEnum.E);
+        app1.addControl(arrow_app01_01);
+        //
+        var arrow_app01_02 = new TongArrow();
+        arrow_app01_02.name = "arrow_app01_02";
+        arrow_app01_02.bindBegin(tbc_DGF1,tbc_DGF1.handleEnum.W);
+        arrow_app01_02.bindEnd(tbc_TLQ1,tbc_TLQ1.handleEnum.E);
+        app1.addControl(arrow_app01_02);
+
+        //appCanvas.addControl(arrow_app01_01);
+
+
+        var arrow_01 = new TongArrow();
+        arrow_01.name = "arrow_01";
+        arrow_01.x = 20;
+        arrow_01.y = 320;
+        arrow_01.ex = 300;
+        arrow_01.ey = 300;
+        appCanvas.addControl(arrow_01);
 
         //appCanvas.paint();
         document.onclick = function(e){

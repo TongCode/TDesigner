@@ -87,6 +87,62 @@ Graphics.prototype.drawText = function(text, font, x, y){
 }
 
 /**
+ * 绘制自定义路径
+ * @param brush
+ * @param points
+ */
+Graphics.prototype.drawPath = function(pen,points){
+    if(points instanceof Array && points.length > 1){
+        this.ctx.save();
+        this.ctx.strokeStyle = pen.Color;
+        this.ctx.lineWidth = pen.Width;
+
+        if(pen.shadowColor != null){
+            this.ctx.shadowColor = pen.shadowColor;
+            this.ctx.shadowBlur = pen.shadowBlur;
+            this.ctx.shadowOffsetX = pen.shadowOffsetX;
+            this.ctx.shadowOffsetY = pen.shadowOffsetY;
+        }
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(points[0].x,points[0].y);
+        for(var i = 1,len = points.length; i < len; i++){
+            var pointItem = points[i];
+            this.ctx.lineTo(pointItem.x, pointItem.y);
+        }
+        this.ctx.closePath();
+        this.ctx.stroke();
+        this.ctx.restore();
+    }
+}
+
+/**
+ * 绘制圆形
+ * @param pen
+ * @param x
+ * @param y
+ * @param radius
+ */
+    Graphics.prototype.drawCircle = function(pen, x, y, radius){
+    this.ctx.save();
+    this.ctx.strokeStyle = pen.Color;
+    this.ctx.lineWidth = pen.Width;
+
+    if(pen.shadowColor != null){
+        this.ctx.shadowColor = pen.shadowColor;
+        this.ctx.shadowBlur = pen.shadowBlur;
+        this.ctx.shadowOffsetX = pen.shadowOffsetX;
+        this.ctx.shadowOffsetY = pen.shadowOffsetY;
+    }
+
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, radius, 0, Math.PI * 2,false);
+    this.ctx.closePath();
+    this.ctx.stroke();
+    this.ctx.restore();
+}
+
+/**
  * 填充字符串
  */
 Graphics.prototype.fillText = function(text, font, x, y){
@@ -141,10 +197,63 @@ Graphics.prototype.fillRect = function(brush,x,y,width,height){
  */
 Graphics.prototype.drawImage = function(image, x, y, width, height){
     this.ctx.save();
-    
+    this.ctx.drawImage(image, x, y, width, height);
     this.ctx.restore();
 }
 
+/**
+ * 绘制自定义路径
+ * @param brush
+ * @param points
+ */
+Graphics.prototype.fillPath = function(brush,points){
+    if(points instanceof Array && points.length > 1){
+        this.ctx.save();
+        this.ctx.fillStyle = brush.Color;
+
+        if(brush.shadowColor != null){
+            this.ctx.shadowColor = brush.shadowColor;
+            this.ctx.shadowBlur = brush.shadowBlur;
+            this.ctx.shadowOffsetX = brush.shadowOffsetX;
+            this.ctx.shadowOffsetY = brush.shadowOffsetY;
+        }
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(points[0].x,points[0].y);
+        for(var i = 1,len = points.length; i < len; i++){
+            var pointItem = points[i];
+            this.ctx.lineTo(pointItem.x, pointItem.y);
+        }
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.restore();
+    }
+}
+
+/**
+ * 填充圆形
+ * @param pen
+ * @param x
+ * @param y
+ * @param radius
+ */
+Graphics.prototype.fillCircle = function(brush, x, y, radius){
+    this.ctx.save();
+    this.ctx.fillStyle = brush.Color;
+
+    if(brush.shadowColor != null){
+        this.ctx.shadowColor = brush.shadowColor;
+        this.ctx.shadowBlur = brush.shadowBlur;
+        this.ctx.shadowOffsetX = brush.shadowOffsetX;
+        this.ctx.shadowOffsetY = brush.shadowOffsetY;
+    }
+
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, radius, 0, Math.PI * 2,false);
+    this.ctx.closePath();
+    this.ctx.fill();
+    this.ctx.restore();
+}
 
 /**
  * 画笔

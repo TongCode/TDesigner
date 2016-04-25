@@ -6,8 +6,12 @@
 function TongComponentDGF(){
     this.canlink = false;
 
-    this.backGroundBrush = new Brush("#595959");
+    //this.backGroundBrush = new Brush("#595959");
 
+    this.image = null;
+    this.imageUrl = "/lib/jTongDesigner/image/icon_r_dgfe.png";
+
+    this.handlePoints = [];
 
 }
 

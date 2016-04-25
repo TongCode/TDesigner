@@ -130,10 +130,12 @@ Canvas.prototype.findControl = function(x,y){
             var controlItem = this.controls[i];
             if(controlItem.pointExists(x,y)){
                 //获取子元素
-                for(var j = controlItem.controls.length -1; j >= 0; j--){
-                    var chControlItem = controlItem.controls[j];
-                    if(chControlItem.pointExists(x,y)){
-                        return chControlItem;
+                if(controlItem.controls!=null){
+                    for(var j = controlItem.controls.length -1; j >= 0; j--){
+                        var chControlItem = controlItem.controls[j];
+                        if(chControlItem.pointExists(x,y)){
+                            return chControlItem;
+                        }
                     }
                 }
                 return controlItem;

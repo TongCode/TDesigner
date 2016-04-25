@@ -37,7 +37,7 @@ function TongApp(){
         drawAppName(g);
 
         //绘制焦点
-        if(this._focus){
+        if(this.isfocus){
             drawPointer(g);
         }
 
@@ -205,6 +205,23 @@ TongApp.prototype.addSink = function(control){
 
         this.controls.push(control);
         this.parent.paint();//App的重绘？不会导致整个层的重绘
+    }else{
+        throw new Error("Name值为："+name+"的控件已经存在！");
+    }
+}
+
+TongApp.prototype.addControl = function(control){
+    if(control == null) return;
+
+    var name = control.name;
+    if(name == null || name === undefined) throw new Error("控件无效的Name值");
+
+    var controlItem = this.getControl(name);
+    if(controlItem == null){
+        control.id = guid.id();
+        control.parent = this;
+        this.controls.push(control);
+        this.parent.paint();
     }else{
         throw new Error("Name值为："+name+"的控件已经存在！");
     }

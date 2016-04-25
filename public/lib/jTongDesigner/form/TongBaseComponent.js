@@ -5,19 +5,10 @@
 
 function TongBaseComponent(){
     var self = this;
-
-    this.drag = false;
+//
+//    this.drag = false;
 
     this.backGroundBrush = new Brush("#009999");
-
-    this.paint = function(g){
-        g.fillRect(this.backGroundBrush,this.parent.x + this.parent.borderWidth + this.x,this.parent.y + this.parent.titleHeight + this.y,this.width,this.height);
-
-        //绘制焦点
-        if(this._focus){
-            this.drawPointer(g);
-        }
-    }
 
     /**
      * 判断指定坐标是否在有效范围
@@ -58,12 +49,9 @@ function TongBaseComponent(){
         var gw = this.width;
         var gh = this.height;
 
-        g.drawRect(tongDesigner.pointerPen,gx,gy ,gw,gh);
-        var pointWidth = 8;
-        var pointOffset = pointWidth / 2;
+        //g.drawRect(tongDesigner.pointerPen,gx,gy ,gw,gh);
 
-        this.handlePoints[0] = {x:gx + gw - pointOffset, y:gy + gh / 2 - pointOffset, w:pointWidth, h:pointWidth};
-        this.handlePoints[1] = {x:gx - pointOffset, y:gy + gh / 2 - pointOffset, w:pointWidth, h:pointWidth};
+
 
 //        g.fillRect(brush,gx + gw / 2 - pointOffset, gy - pointOffset,pointWidth,pointWidth);//上中
 //        g.fillRect(brush,gx + gw - pointOffset, gy + gh / 2 - pointOffset,pointWidth,pointWidth);//右中
@@ -79,16 +67,6 @@ function TongBaseComponent(){
 
     }
 
-    this.handleExists = function(x, y){
-        for(var i = 0, len = this.handlePoints.length; i < len; i++){
-            var rectItem = this.handlePoints[i];
-            if(x >= rectItem.x && x <= rectItem.x + rectItem.w && y >= rectItem.y && y <= rectItem.y + rectItem.h){
-                return true;
-            }
-        }
-        return false;
-    }
-
     //创建连接控制柄位置
     this.drawLinkPoint = function(e){
         //绘制连接△
@@ -97,3 +75,74 @@ function TongBaseComponent(){
 }
 
 TongBaseComponent.prototype = new IControl();
+
+/**
+ * 绘制元素
+ * @param g
+ */
+TongBaseComponent.prototype.paint = function(g){
+
+    var gx = this.getGX();
+    var gy = this.getGY();
+    var gw = this.width;
+    var gh = this.height;
+
+    var self = this;
+    if(this.image == null){
+        imageLoad.load(this.imageUrl,function(image){
+            self.image = image;
+            g.drawImage(image, gx, gy, gw, gh);
+        })
+    }else{
+        g.drawImage(this.image, gx, gy, gw, gh);
+    }
+
+    //g.fillRect(this.backGroundBrush,this.parent.x + this.parent.borderWidth + this.x,this.parent.y + this.parent.titleHeight + this.y,this.width,this.height);
+
+
+    var pointWidth = 8;
+    var pointOffset = pointWidth / 2;
+
+    //更新句柄位置
+    this.handlePoints[0] = {id:this.handleEnum.W, x:gx + gw - pointOffset, y:gy + gh / 2 - pointOffset, w:pointWidth, h:pointWidth};
+    this.handlePoints[1] = {id:this.handleEnum.E, x:gx - pointOffset, y:gy + gh / 2 - pointOffset, w:pointWidth, h:pointWidth};
+
+    //绘制焦点
+    if(this.isfocus){
+        this.drawPointer(g);
+    }
+}
+
+/**
+ * 获取控制柄坐标
+ * @param id
+ * @returns {*}
+ */
+TongBaseComponent.prototype.getHandlePoint = function(id){
+    for(var i = 0, len = this.handlePoints.length; i < len; i++){
+        var rectItem = this.handlePoints[i];
+        if(rectItem.id == id){
+            return rectItem;
+        }
+    }
+    return null;
+}
+
+/**
+ * 判断是否在控制柄中
+ * @param x
+ * @param y
+ * @returns {*}
+ */
+TongBaseComponent.prototype.handleExists = function(x, y){
+    console.log("控制点坐标检测："+this.name+":::"+x+","+y+",",this.handlePoints);
+    for(var i = 0, len = this.handlePoints.length; i < len; i++){
+        var rectItem = this.handlePoints[i];
+        console.log("控制点坐标比较：x="+rectItem.x+","+(rectItem.x + rectItem.w)+",y="+rectItem.y+","+(rectItem.y + rectItem.h)+","+"<>"+x+","+y);
+        if(x >= rectItem.x && x <= rectItem.x + rectItem.w && y >= rectItem.y && y <= rectItem.y + rectItem.h){
+            //封装控制点事件
+            return {id:rectItem.id, x:x, y:y};
+        }
+    }
+    return null;
+}

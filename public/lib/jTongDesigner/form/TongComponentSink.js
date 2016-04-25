@@ -6,8 +6,12 @@
 function TongComponentSink(){
     this.canlink = false;
 
-    this.backGroundBrush = new Brush("#FF00FF");
+    //this.backGroundBrush = new Brush("#FF00FF");
 
+    this.image = null;
+    this.imageUrl = "/lib/jTongDesigner/image/icon_r_tlq.png";
+
+    this.handlePoints = [];
 
 }
 

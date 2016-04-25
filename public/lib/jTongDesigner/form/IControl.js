@@ -11,7 +11,7 @@ function IControl(){
     this.width = 100;               // 元素的宽度
     this.height = 100;              // 元素的高度
 
-    this._focus = false;             // 元素焦点状态
+    this.isfocus = false;             // 元素焦点状态
 
     this.drag = false;              //是否可以拖拽
     this.canfocus = true;           //是否可以获得焦点
@@ -22,6 +22,18 @@ function IControl(){
 
     this.backColor = null;          // 元素的背景色
     this.foreColor = null;          // 元素的前景色
+
+    //控制柄枚举
+    this.handleEnum = {
+        NW  : "nw",
+        N   : "n",
+        NE  : "ne",
+        W   : "w",
+        E   : "e",
+        SW  : "sw",
+        S   : "s",
+        SE  : "se"
+    }
 
 }
 
@@ -41,7 +53,7 @@ IControl.prototype.pointExists = function(x,y){return false;}
  * @param y
  * @returns {boolean}
  */
-IControl.prototype.handleExists = function(x,y){return false;}
+IControl.prototype.handleExists = function(x,y){return null;}
 
 IControl.prototype.getWidth = function(){
     return this.width;
@@ -51,12 +63,12 @@ IControl.prototype.getWidth = function(){
  * 元素获取焦点
  */
 IControl.prototype.focus = function(){
-    this._focus = true;
+    this.isfocus = true;
 }
 
 /**
  * 元素失去焦点
  */
 IControl.prototype.lostFocus = function(){
-    this._focus = false;
+    this.isfocus = false;
 }

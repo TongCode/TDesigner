@@ -20,15 +20,11 @@ function Handler(root,tdesigner){
     var clickName = "onclick";
     this.onclick = function(event){
         //事件转换
-        event = event || window.event;
-        var target = event.toElement || event.relatedTarget || event.srcElement || event.target;
-        var mouseEvent = new MouseEvents(event,target,tdesigner);
+        var mouseEvent = new MouseEvent(event,tdesigner);
         if(self.debug) console.log("点击元素：",mouseEvent.target);
         if(mouseEvent.target!=null){
-
             //缓存事件判断
             if(oldClickEvent == null || oldClickEvent.target.id != mouseEvent.target.id){
-
                 if(oldClickEvent != null){
                     oldClickEvent.target.lostFocus();
                     if(self.debug) console.log("失去焦点："+oldClickEvent);
@@ -45,33 +41,17 @@ function Handler(root,tdesigner){
                 }
             }
 
-            //触发元素事件
             broadcast(mouseEvent.target,clickName,mouseEvent);
-
-//            self.eventTarget = mouseEvent.target;
-//            self.eventCanvas = mouseEvent.canvas;
-
 
         }
         else{
-            if(oldClickEvent != null && oldClickEvent.target._focus){
+            if(oldClickEvent != null && oldClickEvent.target.isfocus){
                 oldClickEvent.target.lostFocus();
                 oldClickEvent.canvas.paint();
             }
 
             oldClickEvent = null;
-
-//            if(self.eventTarget!=null)
-//                self.eventTarget.lostFocus();
-//
-//            if(self.eventCanvas!=null)
-//                self.eventCanvas.paint();
-//
-//            self.eventTarget = null;
-//            self.eventCanvas = null;
         }
-
-
     }
 
     //鼠标移动事件，可以产生出鼠标移入、鼠标移除事件、拖动事件
@@ -80,19 +60,36 @@ function Handler(root,tdesigner){
     var mouseoutName = "onmouseout";
     this.onmousemove = function(event){
 
-        //事件转换
-        event = event || window.event;
-        var target = event.toElement || event.relatedTarget || event.srcElement || event.target;
+        //获取触发事件
+        var mouseEvent = new MouseEvent(event,tdesigner);
 
-        //添加拖动时选择器开关
-        var mouseEvent = new MouseEvents(event,target,tdesigner,!isdrag);
-        //拖动模式，重写事件源，放置筛选算法导致元素切换
-        if(isdrag)
-            mouseEvent.changeTarget({control:oldMouseDownUpEvent.target,canvas:oldMouseDownUpEvent.canvas});
+        if(isdrag){ //拖动中，直接处理元素位移
+            oldMouseDownUpEvent.target.x = mouseEvent.x - oldMouseDownUpEvent.offsetX;
+            oldMouseDownUpEvent.target.y = mouseEvent.y - oldMouseDownUpEvent.offsetY;
+            oldMouseDownUpEvent.canvas.paint();
+        }else if(islink){//链接中，处理链接过程
+            console.log("链接的元素：",oldLinkEvent);
+            //更新制定箭头位置
+            var handlePoint = oldLinkEvent.linkPoint;
+            var target = oldLinkEvent.target;
+            if(handlePoint!=null){
+                if(handlePoint.id == target.handleEnum.E){
+                    //更新结束点
+                    target.ex = mouseEvent.x;
+                    target.ey = mouseEvent.y;
+                }else if(handlePoint.id == target.handleEnum.W){
+                    //更新起始点
+                    target.x = mouseEvent.x;
+                    target.y = mouseEvent.y;
+                }
 
-        //获取当前可以处理的元素，如果是存在则触发进入事件
-        if(mouseEvent.target!=null){
-            //如果存在正在处理的元素对象，处理新元素的进入事件
+                oldLinkEvent.canvas.paint();
+            }
+        }
+
+        //处理移动
+        if(mouseEvent.target != null){
+            //元素进入
             if(oldMouseEvent == null || oldMouseEvent.target.id != mouseEvent.target.id){
                 if(oldMouseEvent != null)
                     broadcast(oldMouseEvent.target,mouseoutName,mouseEvent);
@@ -101,33 +98,49 @@ function Handler(root,tdesigner){
                 broadcast(mouseEvent.target,mouseoverName,mouseEvent);
             }
 
-            //判断是否是拖动
-//            console.log("拖动监测：",isdrag,oldMouseDownUpEvent,mouseEvent.button,MouseButton.LeftButton);
-            //添加元素只有在获得焦点之后才可拖动
-            //添加元素可拖动标记
-            //console.log("拖动权限监测："+mouseEvent.target.name+","+mouseEvent.target.drag+"比对"+(mouseEvent.target.drag && !isdrag && oldMouseDownUpEvent != null && mouseEvent.button == MouseButton.LeftButton && mouseEvent.target._focus)+"比对"+isdrag);
-            if(mouseEvent.target.drag && !isdrag && oldMouseDownUpEvent != null && mouseEvent.button == MouseButton.LeftButton && mouseEvent.target._focus){
-                //console.log("拖动开始..");
-                //拖动开始
-                isdrag = true;
-                broadcast(oldMouseDownUpEvent,dragBeginName,mouseEvent);
+            //@add 添加入口判断条件，只有非拖拽状态下且元素具有焦点的情况下可以拖拽 减少代码执行量
+            if(!isdrag && isCanDrap && mouseEvent.target.isfocus){
+                var canDragBegin = isCanDrap && mouseEvent.target.drag && oldMouseDownUpEvent != null && oldMouseDownUpEvent.button == MouseButton.LeftButton;
+                if(self.debug)console.log("拖动检测结果：",canDragBegin);
+                if(canDragBegin){
+                    if(self.debug)console.log("拖动开始..");
+                    //拖动开始
+                    isdrag = true;
+                    broadcast(oldMouseDownUpEvent,dragBeginName,mouseEvent);
+                }
             }
-            //@2016-04-20 添加链接拖拽功能，判断是否在控制点上
-//            else if(mouseEvent.target.canlink && !link && oldMouseDownUpEvent != null && mouseEvent.button == MouseButton.LeftButton && mouseEvent.target._focus){
-//
-//
-//            }
-            else if(isdrag  && mouseEvent.target._focus){
-                //拖动处理
-                //更新元素位置
-                mouseEvent.target.x = mouseEvent.x - oldMouseDownUpEvent.offsetX;
-                mouseEvent.target.y = mouseEvent.y - oldMouseDownUpEvent.offsetY;
-                mouseEvent.canvas.paint();
+
+            //@add
+            if(!islink && isCanLink && mouseEvent.target.isfocus){
+                var canLinkBegin = isCanLink;
+                if(self.debug)console.log("可用链接点为：",oldMouseDownUpEvent.linkPoint);
+                oldLinkEvent = oldMouseDownUpEvent;
+                //判断是点在可连接元素还是链接线上，如果是元素上，且有存在的连接线，则改变事件元素，如果是连线则进行处理，如果元素无连接，则创建链接
+                if(!(oldMouseDownUpEvent.target instanceof TongArrow)){
+                    //获取指定连接点绑定的连接线
+                    var tmpArrow = new TongArrow();
+                    tmpArrow.id = guid.id();
+                    tmpArrow.name = tmpArrow.id;
+                    tmpArrow.ex = mouseEvent.x;
+                    tmpArrow.ey = mouseEvent.y;
+
+                    //将元素的触发句柄作为开始点绑定到箭头开始，模拟触发的为箭头的结束点
+                    tmpArrow.bindBegin(oldMouseDownUpEvent.target,oldMouseDownUpEvent.linkPoint.id);
+
+                    //构建事件源，模拟触发的控制点为箭头的结束点
+                    oldLinkEvent.linkPoint = {id:oldMouseDownUpEvent.target.handleEnum.E, x:mouseEvent.x, y:mouseEvent.y};
+
+                    oldMouseDownUpEvent.target.parent.parent.addControl(tmpArrow);
+
+                    oldLinkEvent.target = tmpArrow;
+                }
+                islink = true;
+                self.jtd.setCursor("crosshair");
             }
 
             //添加鼠标改变，如果鼠标移入的控件处于焦点状态,添加非拖拽模式下进行修改，拖拽中无需修改，减少代码执行
-            if(!isdrag){
-                if(mouseEvent.target._focus){
+            if(!isdrag && !islink){
+                if(mouseEvent.target.isfocus){
                     self.jtd.setCursor("move");
                 }else{
                     //修复鼠标还原
@@ -135,30 +148,18 @@ function Handler(root,tdesigner){
                 }
             }
 
-//           if(self.eventTarget==null || self.eventTarget.id != mouseEvent.target.id){
-//               if(self.eventTarget!=null){
-//                   //self.eventTarget.onmouseout(mouseEvent);
-//                   broadcast(self.eventTarget,mouseoutName,mouseEvent);
-//               }
-//                self.eventTarget = mouseEvent.target;
-//                self.eventCanvas = mouseEvent.canvas;
-////                mouseEvent.target.onmouseover(mouseEvent);
-//               broadcast(mouseEvent.target,mouseoverName,mouseEvent);
-//            }
+
         }else{
             //处理鼠标移出事件
             if(oldMouseEvent != null){
                 broadcast(oldMouseEvent.target,mouseoutName,mouseEvent);
             }
-
             oldMouseEvent = null;
-            self.jtd.setCursor("default");
-//            if(self.eventTarget!=null)
-//                broadcast(self.eventTarget,mouseoutName,mouseEvent);
-////                self.eventTarget.onmouseout(mouseEvent);
 
-//            self.eventTarget = null;
-//            self.eventCanvas = null;
+            //链接事件移出后需要保持状态
+            if(!islink){
+                self.jtd.setCursor("default");
+            }
         }
     }
 
@@ -171,24 +172,45 @@ function Handler(root,tdesigner){
     var oldMouseDownUpEvent = null;//记录点击历史？
     var mouseupName = "onmouseup";
     var mousedownName = "onmousedown";
+    var isCanLink = false,isCanDrap = false;
     this.onmousedown = function(event){
-        //事件转换
-        event = event || window.event;
-        var target = event.toElement || event.relatedTarget || event.srcElement || event.target;
-        var mouseEvent = new MouseEvents(event,target,tdesigner);
+        //获取触发事件
+        var mouseEvent = new MouseEvent(event,tdesigner);
+        getMouseOffsetInControl(mouseEvent);//处理偏移量
+        //鼠标按键处理
+        //@add 2016-04-21 代码重构添加按下预判操作
+        //如果有点击到元素
+        if(mouseEvent.target!=null){
+            //如果元素已经获取到焦点，
+            if(mouseEvent.target.isfocus){
+                //并且在控制柄中
+                var handleEnumItem = mouseEvent.target.handleExists(mouseEvent.x, mouseEvent.y);
+                if(self.debug)console.log("点击在句柄：",handleEnumItem);
+                if(handleEnumItem!=null){
+
+                    mouseEvent.linkPoint = handleEnumItem;
+
+                    //在控制句柄上触发，如果移动则为链接事件
+                    isCanLink = true;
+                    isCanDrap = false;
+                }else{
+                    //未在控制句柄上触发，如果移动则为移动
+                    isCanLink = false;
+                    isCanDrap = true;
+                }
+                if(self.debug)console.log("点击结果监控：",isCanLink,isCanDrap);
+            }
+        }
 
         //判断鼠标在指定元素上按下
         oldMouseDownUpEvent = mouseEvent;
-
         broadcast(mouseEvent.target,mousedownName,mouseEvent);
 
     }
     //鼠标抬起事件，可能按住后 移动到元素外，处理新元素的抬起
     this.onmouseup = function(event){
         //事件转换
-        event = event || window.event;
-        var target = event.toElement || event.relatedTarget || event.srcElement || event.target;
-        var mouseEvent = new MouseEvents(event,target,tdesigner);
+        var mouseEvent = new MouseEvent(event,tdesigner);
 
         //触发抬起事件
         broadcast(mouseEvent.target,mouseupName,mouseEvent);
@@ -197,15 +219,29 @@ function Handler(root,tdesigner){
         if(isdrag){
             isdrag = false;
             broadcast(mouseEvent.target,dragEndName,mouseEvent);
+        }else if(islink){
+            islink = false;
+
         }
 
+        //链接停止
+
         oldMouseDownUpEvent = null;
+        isCanLink = false;
+        isCanDrap = false;
     }
 
     //拖动事件
     var isdrag = false;
     var dragBeginName = "ondragbegin";
     var dragEndName = "ondragend";
+
+    //链接事件
+    var islink = false;
+    var oldLinkEvent = null;
+    var linkBeginName = "onlinkbegin";
+    var linkEndName = "onlinkend";
+
 
     //初始化事件绑定
     if(window.addEventListener){
@@ -247,12 +283,14 @@ function Handler(root,tdesigner){
 }
 
 /**
- * 鼠标事件
+ * 转换基础的Event
  * @param event
  * @param tdesigner
  * @constructor
  */
-function MouseEvents(event,target,tdesigner,selector){
+function MouseEvent(event,tdesigner){
+
+    event = event || window.event;
 
     if(event.stopPropagation){
         event.stopPropagation();
@@ -260,61 +298,34 @@ function MouseEvents(event,target,tdesigner,selector){
         event.cancelBubble = true;
     }
 
-    var self = this;
-
-    //坐标转换
-    this.altKey         = event.altKey;           //alt是否按下
-    this.ctrlKey        = event.ctrlKey;          //ctrl是否按下
-    this.shiftKey       = event.shiftKey;         //shift是否按下
-    this.metaKey        = event.metaKey;          //meta是否按下
-
-    this.mouseX         = event.x;                //鼠标X坐标
-    this.mouseY         = event.y;                //鼠标Y坐标
+    //转换基础的鼠标事件信息
+    this.sourceX        = event.x;
+    this.sourceY        = event.y;
+    this.sender         = event.toElement || event.relatedTarget || event.srcElement || event.target;
+    this.button         = window.attachEvent ? (event.button == 1 ? 0 : (event.button == 4 ? 1 : event.button)) : event.button;
 
     this.x              = event.x - tdesigner.x;  //x坐标
     this.y              = event.y - tdesigner.y;  //y坐标
 
-    this.button         = window.attachEvent ? (event.button == 1 ? 0 : (event.button == 4 ? 1 : event.button)) : event.button;
-
-    this.fromTarget     = target;
-
-    var isNeedSelector = selector === undefined ? true : selector;//添加是否需要选择元素开关，减少选择元素次数，默认开启
-    //提供改变事件源的函数，主要方便一些事件源的构造
-    this.changeTarget = function(sender){
-        if(sender!=null){
-            this.target = sender.control;
-            this.canvas = sender.canvas;
-            //添加偏移量记录
-            this.offsetX = this.x - sender.control.x;
-            this.offsetY = this.y - sender.control.y;
-            console.log("监控偏移量："+this.offsetX+","+this.offsetY);
-        }else{
-            this.target = null;
-            this.canvas = null;
-            this.offsetX = null;
-            this.offsetY = null;
-        }
+    //选择图形
+    this.target = null;
+    this.canvas = null;
+    var newEventTarget = tdesigner.getEventTarget(this.x,this.y);
+    if(newEventTarget!=null){
+        this.canvas     = newEventTarget.canvas;
+        this.target     = newEventTarget.control;
     }
+}
 
-    //获取优先触发的元素
-    var sender = isNeedSelector ? tdesigner.getEventTarget(this.x,this.y) : null;
-    this.changeTarget(sender);
-//    var sender = tdesigner.getEventTarget(this.x,this.y);
-//
-//    if(sender != null){
-//        this.target = sender.control;
-//        this.canvas = sender.canvas;
-//
-//        //添加偏移量记录
-//        this.offsetX = this.x - this.target.x;
-//        this.offsetY = this.y - this.target.y;
-//
-//    }else{
-//        this.target = null;
-//        this.canvas = null;
-//        this.offsetX = null;
-//        this.offsetY = null;
-//    }
+/**
+ * 处理指定的事件偏移量
+ * @param event
+ */
+function getMouseOffsetInControl(event){
+    if(event !=null && event.target!=null){
+        event.offsetX = event.x - event.target.x;
+        event.offsetY = event.y - event.target.y;
+    }
 }
 
 /**
