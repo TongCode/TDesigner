@@ -4,7 +4,7 @@
  */
 
 function TongComponentSink(){
-    this.canlink = false;
+    this.canlink = true;
 
     //this.backGroundBrush = new Brush("#FF00FF");
 
@@ -13,6 +13,10 @@ function TongComponentSink(){
 
     this.handlePoints = [];
 
+    //Sink处于接收端，默认链接为W
+//    this.getDefaultLinkPoint = function(){
+//
+//    }
 }
 
 TongComponentSink.prototype = new TongBaseComponent();

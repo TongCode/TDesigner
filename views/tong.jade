@@ -58,14 +58,14 @@ block javascript
         //连接线
         var arrow_app02_01 = new TongArrow();
         arrow_app02_01.name = "arrow_app02_01";
-        arrow_app02_01.bindBegin(tbc_CDC2,tbc_CDC2.handleEnum.W);
-        arrow_app02_01.bindEnd(tbc_DGF2,tbc_DGF2.handleEnum.E);
+        arrow_app02_01.bindBegin(tbc_CDC2,tbc_CDC2.handleEnum.E);
+        arrow_app02_01.bindEnd(tbc_DGF2,tbc_DGF2.handleEnum.W);
         app.addControl(arrow_app02_01);
         //
         var arrow_app02_02 = new TongArrow();
         arrow_app02_02.name = "arrow_app02_02";
-        arrow_app02_02.bindBegin(tbc_DGF2,tbc_DGF2.handleEnum.W);
-        arrow_app02_02.bindEnd(tbc_TLQ2,tbc_TLQ2.handleEnum.E);
+        arrow_app02_02.bindBegin(tbc_DGF2,tbc_DGF2.handleEnum.E);
+        arrow_app02_02.bindEnd(tbc_TLQ2,tbc_TLQ2.handleEnum.W);
         app.addControl(arrow_app02_02);
 
 
@@ -98,37 +98,31 @@ block javascript
         //连接线
         var arrow_app01_01 = new TongArrow();
         arrow_app01_01.name = "arrow_app01_01";
-        arrow_app01_01.bindBegin(tbc_CDC1,tbc_CDC1.handleEnum.W);
-        arrow_app01_01.bindEnd(tbc_DGF1,tbc_DGF1.handleEnum.E);
+        arrow_app01_01.bindBegin(tbc_CDC1,tbc_CDC1.handleEnum.E);
+        arrow_app01_01.bindEnd(tbc_DGF1,tbc_DGF1.handleEnum.W);
         app1.addControl(arrow_app01_01);
         //
         var arrow_app01_02 = new TongArrow();
         arrow_app01_02.name = "arrow_app01_02";
-        arrow_app01_02.bindBegin(tbc_DGF1,tbc_DGF1.handleEnum.W);
-        arrow_app01_02.bindEnd(tbc_TLQ1,tbc_TLQ1.handleEnum.E);
+        arrow_app01_02.bindBegin(tbc_DGF1,tbc_DGF1.handleEnum.E);
+        arrow_app01_02.bindEnd(tbc_TLQ1,tbc_TLQ1.handleEnum.W);
         app1.addControl(arrow_app01_02);
 
         //appCanvas.addControl(arrow_app01_01);
 
 
-        var arrow_01 = new TongArrow();
-        arrow_01.name = "arrow_01";
-        arrow_01.x = 20;
-        arrow_01.y = 320;
-        arrow_01.ex = 300;
-        arrow_01.ey = 300;
-        appCanvas.addControl(arrow_01);
+        //var arrow_01 = new TongArrow();
+        //arrow_01.name = "arrow_01";
+        //arrow_01.x = 20;
+        //arrow_01.y = 320;
+        //arrow_01.ex = 300;
+        //arrow_01.ey = 300;
+        //appCanvas.addControl(arrow_01);
 
         //appCanvas.paint();
         document.onclick = function(e){
             console.log("body click");
         }
 
-        function testClick(){
-            app.focus = !app.focus;
-            appCanvas.paint();
-        }
-
 block content
     #Main.MainPanel
-    a(onclick="testClick()") 点击

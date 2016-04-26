@@ -164,8 +164,42 @@ function TongArrow(){
             && y >= minY
             && y <= maxY;
 
+        if(hasRect){
+            //在有效范围内，判断是否在线段上，使用向量计算，匹配精度，小数后1位
+            //添加垂直、水平校验，水平时，ay-iy=0,判断y-iy = 0
+            //修改算法，重定参考点，矩形的参考点不准确。
+            var p1x,p1y,p2x,p2y;
+            if(this.x < this.ex){
+                p1x = this.x;
+                p1y = this.y;
+                p2x = this.ex;
+                p2y = this.ey;
+            }else{
+                p1x = this.ex;
+                p1y = this.ey;
+                p2x = this.x;
+                p2y = this.y;
+            }
+
+            var xwidth = p2x-p1x;
+            var yheight = p2y-p1y;
+            console.log("水平垂直检测："+xwidth+"("+p2x+","+p1x+")"+","+yheight+"("+p2y+","+p1y+")");
+            if(xwidth < 5){//垂直
+                console.log("垂直："+x);
+                hasRect = (Math.abs(x - p1x) <= 5) ? true : false;
+            }else if(yheight < 5){//水平
+                console.log("水平："+y);
+                hasRect = (Math.abs(y - p1y) <= 5) ? true : false;
+            }else{
+                var vx = xwidth/(x-p1x);
+                var vy = yheight/(y-p1y);
+                console.log("匹配校验:"+vx+"("+xwidth+","+(x-p1x)+")"+","+vy+"("+yheight+","+(y-p1y)+")");
+                hasRect = (vx.toFixed(1)==vy.toFixed(1)) ? true : false;
+            }
+        }
+
         if(!hasRect)//如果不在范围内，附带判断是否在控制点上
-            hasRect = this.handleExists(x,y);
+            hasRect = (this.handleExists(x,y) != null);
 
         return hasRect;
     }

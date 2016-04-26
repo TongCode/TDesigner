@@ -68,7 +68,6 @@ function Handler(root,tdesigner){
             oldMouseDownUpEvent.target.y = mouseEvent.y - oldMouseDownUpEvent.offsetY;
             oldMouseDownUpEvent.canvas.paint();
         }else if(islink){//链接中，处理链接过程
-            console.log("链接的元素：",oldLinkEvent);
             //更新制定箭头位置
             var handlePoint = oldLinkEvent.linkPoint;
             var target = oldLinkEvent.target;
@@ -91,8 +90,37 @@ function Handler(root,tdesigner){
         if(mouseEvent.target != null){
             //元素进入
             if(oldMouseEvent == null || oldMouseEvent.target.id != mouseEvent.target.id){
-                if(oldMouseEvent != null)
+                if(oldMouseEvent != null){
+                    //链接离开事件
+                    if(islink){
+                        //判断是否是可连接元素
+                        if(oldMouseEvent.target instanceof TongComponentSink){
+                            oldMouseEvent.target.lostFocus();
+                            oldMouseEvent.canvas.paint();
+                        }else if(oldMouseEvent.target instanceof TongComponentSource){
+                            oldMouseEvent.target.lostFocus();
+                            oldMouseEvent.canvas.paint();
+                        }
+                        oldLinkTargetEvent = null;
+                    }
                     broadcast(oldMouseEvent.target,mouseoutName,mouseEvent);
+                }
+
+
+                //判断是否连接进入
+                if(islink){
+                    //判断是否是可连接元素
+                    //如果链接的开始是Source
+                    if(mouseEvent.target instanceof TongComponentSink){
+                        mouseEvent.target.focus();
+                        mouseEvent.canvas.paint();
+                    }else if(mouseEvent.target instanceof TongComponentSource){
+                        mouseEvent.target.focus();
+                        mouseEvent.canvas.paint();
+                        oldLinkTargetEvent = mouseEvent.target;
+                    }
+
+                }
 
                 oldMouseEvent = mouseEvent;
                 broadcast(mouseEvent.target,mouseoverName,mouseEvent);
@@ -152,6 +180,20 @@ function Handler(root,tdesigner){
         }else{
             //处理鼠标移出事件
             if(oldMouseEvent != null){
+
+                //链接离开事件
+                if(islink){
+                    //判断是否是可连接元素
+                    if(oldMouseEvent.target instanceof TongComponentSink){
+                        oldMouseEvent.target.lostFocus();
+                        oldMouseEvent.canvas.paint();
+                    }else if(oldMouseEvent.target instanceof TongComponentSource){
+                        oldMouseEvent.target.lostFocus();
+                        oldMouseEvent.canvas.paint();
+                    }
+                    oldLinkTargetEvent = null;
+                }
+
                 broadcast(oldMouseEvent.target,mouseoutName,mouseEvent);
             }
             oldMouseEvent = null;
@@ -194,9 +236,30 @@ function Handler(root,tdesigner){
                     isCanLink = true;
                     isCanDrap = false;
                 }else{
-                    //未在控制句柄上触发，如果移动则为移动
-                    isCanLink = false;
-                    isCanDrap = true;
+
+                    //添加元素非控制点触发链接事件，如果元素为Sink和Source则触发默认的连接点事件
+                    if(mouseEvent.target instanceof TongComponentSink){
+                        //默认连接点为E
+                        var  defaultLinPoint = mouseEvent.target.getHandlePoint(mouseEvent.target.handleEnum.E);
+                        mouseEvent.linkPoint = defaultLinPoint;
+
+                        isCanLink = true;
+                        isCanDrap = false;
+
+                    }else if(mouseEvent.target instanceof TongComponentSource){
+                        //默认连接点为E
+                        var  defaultLinPoint = mouseEvent.target.getHandlePoint(mouseEvent.target.handleEnum.W);
+                        mouseEvent.linkPoint = defaultLinPoint;
+
+                        isCanLink = true;
+                        isCanDrap = false;
+
+                    }else{
+
+                        //未在控制句柄上触发，如果移动则为移动
+                        isCanLink = false;
+                        isCanDrap = true;
+                    }
                 }
                 if(self.debug)console.log("点击结果监控：",isCanLink,isCanDrap);
             }
@@ -222,6 +285,23 @@ function Handler(root,tdesigner){
         }else if(islink){
             islink = false;
 
+            //判断是否有可用的链接目标
+            console.log("可用链接目标为：",oldLinkTargetEvent);
+            var tmpArrow = oldLinkEvent.target;
+            if(oldLinkTargetEvent!=null){
+                if(oldLinkTargetEvent instanceof TongComponentSink){
+                    tmpArrow.bindEnd(oldLinkTargetEvent,oldLinkTargetEvent.handleEnum.E);
+                }else if(oldLinkTargetEvent instanceof TongComponentSource){
+                    tmpArrow.bindEnd(oldLinkTargetEvent,oldLinkTargetEvent.handleEnum.W);
+                }
+            }else{
+                tmpArrow.parent.removeControl(tmpArrow.id);
+            }
+
+            //判断释放的元素位置，如果为null 表示拖动失败，消除元素
+//            if(tmpArrow.endControl == null){
+//
+//            }
         }
 
         //链接停止
@@ -239,6 +319,7 @@ function Handler(root,tdesigner){
     //链接事件
     var islink = false;
     var oldLinkEvent = null;
+    var oldLinkTargetEvent = null;//链接目标元素
     var linkBeginName = "onlinkbegin";
     var linkEndName = "onlinkend";
 

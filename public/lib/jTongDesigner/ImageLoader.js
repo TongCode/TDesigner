@@ -19,7 +19,7 @@ ImageLoader.prototype.load = function(url,callback){
         image = new Image();
         image.onload = function(e){
             self.imageCache[url] = image;
-            callback(image);
+            if(callback) callback(image);
         }
         image.src = url;
     }else{
@@ -42,3 +42,12 @@ ImageLoader.prototype.getImage = function(url){
 }
 
 var imageLoad = new ImageLoader();
+
+//缓存通用图片
+imageLoad.load("/lib/jTongDesigner/image/icon_r_cdc.png");
+imageLoad.load("/lib/jTongDesigner/image/icon_r_dgfe.png");
+imageLoad.load("/lib/jTongDesigner/image/icon_r_dgfg.png");
+imageLoad.load("/lib/jTongDesigner/image/icon_r_dgfr.png");
+imageLoad.load("/lib/jTongDesigner/image/icon_r_tlq.png");
+imageLoad.load("/lib/jTongDesigner/image/icon_r_sql.png");
+imageLoad.load("/lib/jTongDesigner/image/icon_r_table.png");

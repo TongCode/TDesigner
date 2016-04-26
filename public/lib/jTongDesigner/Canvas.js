@@ -120,6 +120,22 @@ Canvas.prototype.addControl = function(control){
 }
 
 /**
+ * 移除指定的元素
+ * @param id
+ */
+Canvas.prototype.removeControl = function(id){
+    if(this.controls.length > 0){
+        for(var i = this.controls.length - 1; i>=0 ;i--){
+            var controlItem = this.controls[i];
+            if(controlItem.id == id){
+                this.controls.splice(i,1);
+                break;
+            }
+        }
+    }
+}
+
+/**
  * 获取指定坐标的元素
  * @param x
  * @param y

@@ -15,7 +15,7 @@ function IControl(){
 
     this.drag = false;              //是否可以拖拽
     this.canfocus = true;           //是否可以获得焦点
-    this.canlink = true;            //是否可以进行连接
+    this.canlink = false;            //是否可以进行连接
 
     this.borderColor = null;        // 元素的边框颜色
     this.borderWidth = 0;           // 元素的边框宽度
@@ -51,7 +51,7 @@ IControl.prototype.pointExists = function(x,y){return false;}
  * 判断指定的坐标是否在控制点范围内
  * @param x
  * @param y
- * @returns {boolean}
+ * @returns {object}
  */
 IControl.prototype.handleExists = function(x,y){return null;}
 

@@ -104,8 +104,8 @@ TongBaseComponent.prototype.paint = function(g){
     var pointOffset = pointWidth / 2;
 
     //更新句柄位置
-    this.handlePoints[0] = {id:this.handleEnum.W, x:gx + gw - pointOffset, y:gy + gh / 2 - pointOffset, w:pointWidth, h:pointWidth};
-    this.handlePoints[1] = {id:this.handleEnum.E, x:gx - pointOffset, y:gy + gh / 2 - pointOffset, w:pointWidth, h:pointWidth};
+    this.handlePoints[0] = {id:this.handleEnum.E, x:gx + gw - pointOffset, y:gy + gh / 2 - pointOffset, w:pointWidth, h:pointWidth};
+    this.handlePoints[1] = {id:this.handleEnum.W, x:gx - pointOffset, y:gy + gh / 2 - pointOffset, w:pointWidth, h:pointWidth};
 
     //绘制焦点
     if(this.isfocus){
@@ -127,6 +127,12 @@ TongBaseComponent.prototype.getHandlePoint = function(id){
     }
     return null;
 }
+
+/**
+ * 获取默认的连接位置，方便通过元素链接
+ * @returns {null}
+ */
+//TongBaseComponent.prototype.getDefaultLinkPoint = function(){return null;}
 
 /**
  * 判断是否在控制柄中

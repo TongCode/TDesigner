@@ -4,7 +4,7 @@
  */
 
 function TongComponentSource(){
-    this.canlink = false;
+    this.canlink = true;
 
     //this.backGroundBrush = new Brush("#0A0A0A");
 
@@ -13,6 +13,13 @@ function TongComponentSource(){
 
     this.handlePoints = [];
 
+//    this.onmouseover = function(e){
+//        console.log("拖动进来啦~~");
+//    }
+
+    this.onmouseout = function(e){
+        console.log("拖动离开啦~~");
+    }
 }
 
 TongComponentSource.prototype = new TongBaseComponent();
